@@ -1,0 +1,189 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model Item {
+    id              String            @id @default(auto()) @map("_id") @db.ObjectId
+    createDate      DateTime          @default(now())
+    updateDate      DateTime          @updatedAt
+    name            String
+    image           String?
+    itemColorId     String            @db.ObjectId
+    itemSizeId      String            @db.ObjectId
+    itemCategoryId  String            @db.ObjectId
+    itemBrandId     String            @db.ObjectId
+    shelfBoxId      String?           @db.ObjectId
+    shelfId         String?           @db.ObjectId
+    brand           ItemBrand         @relation(fields: [itemBrandId], references: [id])
+    category        ItemCategory      @relation(fields: [itemCategoryId], references: [id])
+    color           ItemColor         @relation(fields: [itemColorId], references: [id])
+    size            ItemSize          @relation(fields: [itemSizeId], references: [id])
+    shelf           Shelf?            @relation(fields: [shelfId], references: [id])
+    shelfBox        ShelfBox?         @relation(fields: [shelfBoxId], references: [id])
+    ShelfItemDetail ShelfItemDetail[]
+    itemBarcode     itemBarcode[]
+    user            User              @relation(fields: [userId], references: [id])
+    userId          String            @db.ObjectId
+
+    @@index([itemColorId])
+    @@index([itemSizeId])
+    @@index([itemCategoryId])
+    @@index([itemBrandId])
+    @@index([shelfBoxId])
+    @@index([shelfId])
+}
+
+model Shelf {
+    id         String            @id @default(auto()) @map("_id") @db.ObjectId
+    createDate DateTime          @default(now())
+    updateDate DateTime          @updatedAt
+    name       String?
+    boxes      ShelfBox[]
+    items      ShelfItemDetail[]
+    Item       Item[]
+    user       User              @relation(fields: [userId], references: [id])
+    userId     String            @db.ObjectId
+}
+
+model ShelfBox {
+    id         String            @id @default(auto()) @map("_id") @db.ObjectId
+    createDate DateTime          @default(now())
+    updateDate DateTime          @updatedAt
+    shelfId    String?           @db.ObjectId
+    name       String?
+    Shelf      Shelf?            @relation(fields: [shelfId], references: [id])
+    items      ShelfItemDetail[]
+    Item       Item[]
+    user       User              @relation(fields: [userId], references: [id])
+    userId     String            @db.ObjectId
+
+    @@index([shelfId])
+}
+
+model ShelfItemDetail {
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    createDate DateTime  @default(now())
+    updateDate DateTime  @updatedAt
+    shelfId    String?   @db.ObjectId
+    shelfBoxId String?   @db.ObjectId
+    itemId     String    @db.ObjectId
+    quantity   Int
+    item       Item      @relation(fields: [itemId], references: [id])
+    ShelfBox   ShelfBox? @relation(fields: [shelfBoxId], references: [id])
+    Shelf      Shelf?    @relation(fields: [shelfId], references: [id])
+    user       User      @relation(fields: [userId], references: [id])
+    userId     String    @db.ObjectId
+
+    @@index([itemId])
+    @@index([shelfBoxId])
+    @@index([shelfId])
+}
+
+model itemBarcode {
+    id       String  @id @default(auto()) @map("_id") @db.ObjectId
+    barcode  String
+    unit     String
+    isMaster Boolean
+    quantity Int
+    itemId   String  @db.ObjectId
+    item     Item    @relation(fields: [itemId], references: [id])
+    user     User    @relation(fields: [userId], references: [id])
+    userId   String  @db.ObjectId
+
+    @@index([itemId])
+}
+
+model ItemColor {
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    colorCode String
+    colorText String
+    Item      Item[]
+    user      User   @relation(fields: [userId], references: [id])
+    userId    String @db.ObjectId
+}
+
+model ItemSize {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    sizeCode String
+    sizeText String
+    Item     Item[]
+    user     User   @relation(fields: [userId], references: [id])
+    userId   String @db.ObjectId
+}
+
+model ItemCategory {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    name   String
+    Item   Item[]
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @db.ObjectId
+}
+
+model ItemBrand {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    name   String
+    Item   Item[]
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @db.ObjectId
+}
+
+// Necessary for Next auth
+model Account {
+    id                       String  @id @default(auto()) @map("_id") @db.ObjectId
+    userId                   String  @db.ObjectId
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String?
+    access_token             String?
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String?
+    session_state            String?
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refresh_token_expires_in Int?
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    sessionToken String   @unique
+    userId       String   @db.ObjectId
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id              String            @id @default(auto()) @map("_id") @db.ObjectId
+    name            String?
+    email           String?           @unique
+    emailVerified   DateTime?
+    image           String?
+    accounts        Account[]
+    sessions        Session[]
+    Item            Item[]
+    Shelf           Shelf[]
+    ShelfBox        ShelfBox[]
+    ShelfItemDetail ShelfItemDetail[]
+    itemBarcode     itemBarcode[]
+    ItemColor       ItemColor[]
+    ItemSize        ItemSize[]
+    ItemCategory    ItemCategory[]
+    ItemBrand       ItemBrand[]
+}
+
+model VerificationToken {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
