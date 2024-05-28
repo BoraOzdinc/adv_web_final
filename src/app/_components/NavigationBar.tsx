@@ -22,7 +22,7 @@ function NavigationBar() {
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
                     <a
-                      className="from-muted/50 to-muted flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b p-6 no-underline outline-none focus:shadow-md"
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                       href="/"
                     >
                       <div className="mb-2 mt-4 text-lg font-medium">
@@ -36,6 +36,9 @@ function NavigationBar() {
                 </ListItem>
                 <ListItem href="/items" title="All Items">
                   List of all your items
+                </ListItem>
+                <ListItem href="/layout" title="Layout">
+                  Know where your items are
                 </ListItem>
               </ul>
             </NavigationMenuContent>
@@ -55,11 +58,11 @@ const ListItem = React.forwardRef<
       <NavigationMenuLink asChild>
         <a
           ref={ref}
-          className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors"
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           {...props}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
         </a>

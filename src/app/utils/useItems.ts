@@ -1,84 +1,6 @@
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 
-
-export const useAddSize = () => {
-    const utils = api.useUtils();
-    return api.item.addSize.useMutation({
-        onSuccess: async (_d,) => {
-            toast.success("Size Added!", { id: "item.addSize" });
-            await utils.item.getSize.invalidate()
-        },
-        onMutate: () => {
-            toast.loading("Adding Size...", {
-                id: "item.addSize",
-            });
-        },
-        onError(error) {
-            toast.error(String(error.data?.zodError ?? error.message), {
-                id: "item.addSize",
-            });
-        },
-    });
-};
-export const useAddColor = () => {
-    const utils = api.useUtils();
-    return api.item.addColor.useMutation({
-        onSuccess: async (_d,) => {
-            toast.success("Color Added!", { id: "item.addColor" });
-            await utils.item.getColor.invalidate()
-        },
-        onMutate: () => {
-            toast.loading("Adding Color...", {
-                id: "item.addColor",
-            });
-        },
-        onError(error) {
-            toast.error(String(error.data?.zodError ?? error.message), {
-                id: "item.addColor",
-            });
-        },
-    });
-};
-export const useAddCategory = () => {
-    const utils = api.useUtils();
-    return api.item.addCategory.useMutation({
-        onSuccess: async (_d,) => {
-            toast.success("Category Added!", { id: "item.addCategory" });
-            await utils.item.getCategory.invalidate()
-        },
-        onMutate: () => {
-            toast.loading("Adding Category...", {
-                id: "item.addCategory",
-            });
-        },
-        onError(error) {
-            toast.error(String(error.data?.zodError ?? error.message), {
-                id: "item.addCategory",
-            });
-        },
-    });
-};
-export const useAddBrand = () => {
-    const utils = api.useUtils();
-    return api.item.addBrand.useMutation({
-        onSuccess: async (_d,) => {
-            toast.success("Brand Added!", { id: "item.addBrand" });
-            await utils.item.getBrand.invalidate()
-        },
-        onMutate: () => {
-            toast.loading("Adding Brand...", {
-                id: "item.addBrand",
-            });
-        },
-        onError(error) {
-            toast.error(String(error.data?.zodError ?? error.message), {
-                id: "item.addBrand",
-            });
-        },
-    });
-};
-
 export const useAddBarcode = () => {
     const utils = api.useUtils();
     return api.item.addBarcode.useMutation({
@@ -98,26 +20,26 @@ export const useAddBarcode = () => {
         },
     });
 };
-
-export const useUpdateBarcode = () => {
+export const useAddTags = () => {
     const utils = api.useUtils();
-    return api.item.updateBarcode.useMutation({
+    return api.item.addTags.useMutation({
         onSuccess: async (_d,) => {
-            toast.success("Barcode Edited!", { id: "item.updateBarcode" });
-            await utils.item.getItemBarcodesWithId.invalidate()
+            toast.success("Tags Added", { id: "item.addTags" });
+            await utils.item.getTags.invalidate()
         },
         onMutate: () => {
-            toast.loading("Barcode Editing...", {
-                id: "item.updateBarcode",
+            toast.loading("Adding Tags...", {
+                id: "item.addTags",
             });
         },
         onError(error) {
             toast.error(String(error.data?.zodError ?? error.message), {
-                id: "item.updateBarcode",
+                id: "item.addTags",
             });
         },
     });
 };
+
 export const useUpdateItem = () => {
     const utils = api.useUtils();
     return api.item.updateItem.useMutation({
