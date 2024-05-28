@@ -13,6 +13,9 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
+import { TagsIcon } from "lucide-react";
+import { Button } from "../_components/ui/button";
+import Link from "next/link";
 
 type getItemsType = RouterOutputs["item"]["getItems"];
 
@@ -33,9 +36,14 @@ const ItemPage = () => {
   const router = useRouter();
   return (
     <Card className=" w-full">
-      <CardHeader>
-        <CardTitle>Items List</CardTitle>
-        <CardDescription>Click the item you want to edit.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Items List</CardTitle>
+          <CardDescription>Click the item you want to edit.</CardDescription>
+        </div>
+        <Button>
+          <Link href={"/items/new"}>New Item</Link>
+        </Button>
       </CardHeader>
       <CardContent className=" w-full overflow-x-auto ">
         <DataTable
@@ -50,6 +58,19 @@ const ItemPage = () => {
             state: searchInput,
             title: "Name",
           }}
+          columnFilter={[
+            {
+              columnToFilter: "itemTag",
+              title: "Tag",
+              options: [
+                ...new Set(modifiedItemsData?.flatMap((i) => i.itemTag?.name)),
+              ].map((b) => ({
+                label: b ?? "",
+                value: b ?? "",
+              })),
+              icon: <TagsIcon className="mr-2 h-5 w-5" />,
+            },
+          ]}
           pagination
         />
       </CardContent>

@@ -20,6 +20,25 @@ export const useAddBarcode = () => {
         },
     });
 };
+export const useAddItem = () => {
+    const utils = api.useUtils();
+    return api.item.addItem.useMutation({
+        onSuccess: async (_d,) => {
+            toast.success("Item Added", { id: "item.addItem" });
+            await utils.item.getItems.invalidate()
+        },
+        onMutate: () => {
+            toast.loading("Adding Item...", {
+                id: "item.addItem",
+            });
+        },
+        onError(error) {
+            toast.error(String(error.data?.zodError ?? error.message), {
+                id: "item.addItem",
+            });
+        },
+    });
+};
 export const useAddTags = () => {
     const utils = api.useUtils();
     return api.item.addTags.useMutation({
