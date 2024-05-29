@@ -12,17 +12,16 @@ import { api } from "~/trpc/react";
 const ItemTags = () => {
   const [addedTags, setAddedTags] = useState<string[]>([]);
   const [tagString, setTagString] = useState<string>("");
-  const { data: tags, isLoading } = api.item.getTags.useQuery(); // Assuming correct query name
+  const { data: tags, isLoading } = api.item.getTags.useQuery();
   const addTags = useAddTags();
   const isDuplicate = addedTags.includes(tagString);
 
   useEffect(() => {
-    // Update the state with fetched tags
     if (tags) {
       const tagNames = tags.map((tag) => tag.name);
       setAddedTags(tagNames);
     }
-  }, [tags]); // Run this effect when 'tags' data changes
+  }, [tags]);
 
   return (
     <Card>

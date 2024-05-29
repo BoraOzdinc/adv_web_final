@@ -33,7 +33,7 @@ const NewItem = () => {
         <div>
           <Label>Item Name</Label>
           <Input
-            placeholder="tag..."
+            placeholder="Name..."
             value={itemName}
             onChange={(e) => {
               setItemName(e.target.value);

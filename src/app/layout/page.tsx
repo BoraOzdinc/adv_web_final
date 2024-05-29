@@ -90,8 +90,8 @@ const Layout = () => {
           <CardTitle>Layout</CardTitle>
           <CardDescription>Click location for details.</CardDescription>
         </div>
-        <div>
-          <Button onClick={generatePDF}>Generate</Button>
+        <div className="flex flex-row gap-2">
+          <Button onClick={generatePDF}>Generate QrCodes</Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button>New Location</Button>

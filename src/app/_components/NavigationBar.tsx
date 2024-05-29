@@ -18,19 +18,7 @@ function NavigationBar() {
           <NavigationMenuItem>
             <NavigationMenuTrigger>Inventory Ark</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                <li className="row-span-3">
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      href="/"
-                    >
-                      <div className="mb-2 mt-4 text-lg font-medium">
-                        Main Page
-                      </div>
-                    </a>
-                  </NavigationMenuLink>
-                </li>
+              <ul className="grid w-[400px] grid-cols-1 gap-3 p-6">
                 <ListItem href="/configuration" title="Configurations">
                   Configure your items.
                 </ListItem>
