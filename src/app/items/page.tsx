@@ -82,6 +82,9 @@ const columns: ColumnDef<getItemsType[number]>[] = [
   {
     accessorKey: "itemTag",
     header: "Tag",
+    filterFn: (row, id, value: Array<string>) => {
+      return value.includes(row.original.itemTag?.name ?? "");
+    },
     cell({
       row: {
         original: { itemTag },

@@ -47,9 +47,7 @@ export const itemRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-        : "http://localhost:3000";
+      
 
       const qrLink = await generateQR(`${baseUrl}/items/${input.itemId}`);
 
@@ -111,6 +109,10 @@ export const itemRouter = createTRPCRouter({
     }),
 });
 
-const generateQR = async (text: string) => {
+export const generateQR = async (text: string) => {
   return await QRCode.toDataURL(text);
 };
+
+export const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";

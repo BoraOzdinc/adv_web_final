@@ -13,6 +13,7 @@ import {
 } from "~/app/_components/ui/card";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -28,6 +29,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/app/_components/ui/sheet";
+import { useAddItemToLocation } from "~/app/utils/useLocation";
 import { api } from "~/trpc/react";
 
 const LocationDetailPage = () => {
@@ -42,6 +44,7 @@ const LocationDetailPage = () => {
     { name: debouncedInput },
     { enabled: debouncedInput.length >= 3 },
   );
+  const addItem = useAddItemToLocation()
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -91,6 +94,13 @@ const LocationDetailPage = () => {
                       setQuantity(parseInt(e.target.value));
                     }}
                   />
+
+                  <DialogClose asChild>
+                    <Button onClick={()=> {
+                      setQuantity(1);
+                      addItem.mutate({locationId, itemId: item.id, quantity})
+                    }}>Confirm</Button>
+                  </DialogClose>
                 </DialogContent>
               </Dialog>
             ))}
