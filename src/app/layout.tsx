@@ -5,6 +5,8 @@ import { Toaster } from "react-hot-toast";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import NavigationBar from "./_components/NavigationBar";
+import { redirect } from "next/navigation";
+import { getServerAuthSession } from "~/server/auth";
 
 export const metadata = {
   title: "Create T3 App",
@@ -12,11 +14,15 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerAuthSession();
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="flex flex-col gap-3">
