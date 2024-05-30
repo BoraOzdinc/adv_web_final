@@ -7,7 +7,7 @@ export const NON_EMPTY_STRING = z.string().min(1);
 
 export const itemRouter = createTRPCRouter({
   addItem: protectedProcedure
-    .input(z.object({ name: NON_EMPTY_STRING, tag: NON_EMPTY_STRING }))
+    .input(z.object({ name: NON_EMPTY_STRING, tag: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       return await ctx.db.item.create({
         data: {
@@ -114,7 +114,7 @@ export const itemRouter = createTRPCRouter({
           return await ctx.db.itemTags.delete({ where: { id: t.id } });
         }),
       );
-      if(tagsToAdd.length === 0) return { deletedTags, addedTags: [] }
+      if (tagsToAdd.length === 0) return { deletedTags, addedTags: [] }
       const addedTags = await ctx.db.itemTags.createMany({
         data: tagsToAdd.map((t) => ({ name: t, userId: ctx.session.user.id })),
       });

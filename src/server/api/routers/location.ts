@@ -52,4 +52,10 @@ export const locationRouter = createTRPCRouter({
         data: { quantity: locationDetails.quantity + quantity },
       });
     }),
+  updateLocationDetails: protectedProcedure.input(z.object({ locationItemDetailId: NON_EMPTY_STRING, quantity: z.number().min(0) })).mutation(async ({ ctx, input: { locationItemDetailId, quantity } }) => {
+    if (quantity === 0) {
+      return await ctx.db.locationItemDetail.delete({ where: { id: locationItemDetailId } })
+    }
+    return await ctx.db.locationItemDetail.update({ where: { id: locationItemDetailId }, data: { quantity } })
+  })
 });

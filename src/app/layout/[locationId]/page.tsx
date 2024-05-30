@@ -16,11 +16,13 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "~/app/_components/ui/dialog";
 import { Input } from "~/app/_components/ui/input";
+import { Label } from "~/app/_components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -29,13 +31,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/app/_components/ui/sheet";
-import { useAddItemToLocation } from "~/app/utils/useLocation";
+import {
+  useAddItemToLocation,
+  useUpdateItemToLocation,
+} from "~/app/utils/useLocation";
 import { api } from "~/trpc/react";
 
 const LocationDetailPage = () => {
   const { locationId } = useParams<{ locationId: string }>();
   const [input, setInput] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [updateQuantity, setUpdateQuantity] = useState(1);
   const debouncedInput = useDebounce(input, 200);
   const locationDetails = api.location.getLocationDetailsWithId.useQuery({
     locationId,
@@ -44,7 +50,8 @@ const LocationDetailPage = () => {
     { name: debouncedInput },
     { enabled: debouncedInput.length >= 3 },
   );
-  const addItem = useAddItemToLocation()
+  const addItem = useAddItemToLocation();
+  const updateLocation = useUpdateItemToLocation();
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -96,10 +103,18 @@ const LocationDetailPage = () => {
                   />
 
                   <DialogClose asChild>
-                    <Button onClick={()=> {
-                      setQuantity(1);
-                      addItem.mutate({locationId, itemId: item.id, quantity})
-                    }}>Confirm</Button>
+                    <Button
+                      onClick={() => {
+                        setQuantity(1);
+                        addItem.mutate({
+                          locationId,
+                          itemId: item.id,
+                          quantity,
+                        });
+                      }}
+                    >
+                      Confirm
+                    </Button>
                   </DialogClose>
                 </DialogContent>
               </Dialog>
@@ -108,14 +123,70 @@ const LocationDetailPage = () => {
         </Sheet>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-5">
+        {locationDetails.data?.items.length === 0 && <p>No Items Found!</p>}
         {locationDetails.data?.items.map((item) => {
           return (
-            <Card key={item.id}>
-              <CardHeader>
-                <CardTitle>{item.item.name}</CardTitle>
-                <CardDescription>Quantity: {item.quantity}</CardDescription>
-              </CardHeader>
-            </Card>
+            <Dialog
+              key={item.id}
+              onOpenChange={() => setUpdateQuantity(Number(item.quantity))}
+            >
+              <DialogTrigger asChild>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{item.item.name}</CardTitle>
+                    <CardDescription>Quantity: {item.quantity}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{item.item.name}</DialogTitle>
+                  <DialogDescription>Edit this item</DialogDescription>
+                </DialogHeader>
+                <div>
+                  <Label>Quantity</Label>
+                  <Input
+                    placeholder="Quantity..."
+                    type="number"
+                    defaultValue={item.quantity}
+                    onChange={(e) => {
+                      setUpdateQuantity(Number(e.target.value));
+                    }}
+                  />
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button
+                      onClick={() => {
+                        updateLocation.mutate({
+                          locationItemDetailId: item.id,
+                          quantity: updateQuantity,
+                        });
+                      }}
+                    >
+                      Confirm
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button
+                      variant={"secondary"}
+                      onClick={() => {
+                        updateLocation.mutate({
+                          locationItemDetailId: item.id,
+                          quantity: item.quantity - 1,
+                        });
+                      }}
+                      disabled={item.quantity !== updateQuantity}
+                    >
+                      Take One
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button variant={"outline"}>Cancel</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           );
         })}
       </CardContent>

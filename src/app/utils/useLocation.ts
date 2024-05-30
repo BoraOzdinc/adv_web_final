@@ -40,3 +40,22 @@ export const useAddItemToLocation = () => {
     },
   });
 };
+export const useUpdateItemToLocation = () => {
+  const utils = api.useUtils();
+  return api.location.updateLocationDetails.useMutation({
+    onSuccess: async (_d) => {
+      toast.success("Location Updated!", { id: "item.updateItemLocation" });
+      await utils.location.getLocationDetailsWithId.invalidate();
+    },
+    onMutate: () => {
+      toast.loading("Updating Location...", {
+        id: "item.updateItemLocation",
+      });
+    },
+    onError(error) {
+      toast.error(String(error.data?.zodError ?? error.message), {
+        id: "item.updateItemLocation",
+      });
+    },
+  });
+};
