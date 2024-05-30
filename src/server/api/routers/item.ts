@@ -98,12 +98,27 @@ export const itemRouter = createTRPCRouter({
   addTags: protectedProcedure
     .input(z.object({ tags: z.string().array() }))
     .mutation(async ({ ctx, input: { tags } }) => {
-      await ctx.db.itemTags.deleteMany({
+      const allTags = await ctx.db.itemTags.findMany({
         where: { userId: ctx.session.user.id },
+        include: { Item: true },
       });
-      await ctx.db.itemTags.createMany({
-        data: tags.map((t) => ({ name: t, userId: ctx.session.user.id })),
+      const tagsToDelete = allTags.filter((t) => !tags.includes(t.name));
+      const tagsToAdd = tags.filter(
+        (t) => !allTags.map((t) => t.name).includes(t),
+      );
+      const deletedTags = await Promise.all(
+        tagsToDelete.map(async (t) => {
+          if (t.Item.length > 0) {
+            return
+          }
+          return await ctx.db.itemTags.delete({ where: { id: t.id } });
+        }),
+      );
+      if(tagsToAdd.length === 0) return { deletedTags, addedTags: [] }
+      const addedTags = await ctx.db.itemTags.createMany({
+        data: tagsToAdd.map((t) => ({ name: t, userId: ctx.session.user.id })),
       });
+      return { deletedTags, addedTags };
     }),
 });
 

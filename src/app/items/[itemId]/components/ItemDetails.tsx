@@ -71,7 +71,7 @@ const ItemDetailsForm = ({
   const form = useForm<FormInput>({
     defaultValues: {
       name: itemData?.name,
-      tag: itemData?.itemTagsId ?? undefined,
+      tag: itemData?.itemTagId ?? undefined,
     },
   });
 
