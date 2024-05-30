@@ -12,7 +12,7 @@ export const itemRouter = createTRPCRouter({
       return await ctx.db.item.create({
         data: {
           name: input.name,
-          itemTagsId: input.tag,
+          itemTagId: input.tag,
           userId: ctx.session.user.id,
         },
       });
@@ -87,7 +87,7 @@ export const itemRouter = createTRPCRouter({
 
       await ctx.db.item.update({
         where: { id: input.id },
-        data: { name: input.name, itemTagsId: input.tag },
+        data: { name: input.name, itemTagId: input.tag },
       });
     }),
   getTags: protectedProcedure.query(async ({ ctx }) => {
@@ -97,56 +97,13 @@ export const itemRouter = createTRPCRouter({
   }),
   addTags: protectedProcedure
     .input(z.object({ tags: z.string().array() }))
-    .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id; // Replace with actual user ID from ctx
-      const prisma = ctx.db;
-      // 1. Check for existing tags
-      const existingTags = await prisma.itemTags.findMany({
-        where: { userId, name: { in: input.tags } },
+    .mutation(async ({ ctx, input: { tags } }) => {
+      await ctx.db.itemTags.deleteMany({
+        where: { userId: ctx.session.user.id },
       });
-
-      // 2. Identify new tags to create
-      const newTags = input.tags.filter(
-        (tagName) =>
-          !existingTags.some((existingTag) => existingTag.name === tagName),
-      );
-
-      // 3. Identify tags to delete (exclude tags used by items)
-      const tagsToDelete: { id: string; name: string; userId: string; }[] = [];
-      for (const existingTag of existingTags) {
-        const itemUsingTag = await prisma.item.findFirst({
-          where: {
-            itemTagId: existingTag.id, // Use itemTagId here, not existingTag.itemTagId
-          },
-        });
-
-        // Add to deletion list ONLY if not used and not in input tags
-        if (!itemUsingTag && !input.tags.includes(existingTag.name)) {
-          tagsToDelete.push(existingTag);
-        }
-      }
-
-      // 4. Perform database operations within a transaction
-      await prisma.$transaction(async (prisma) => {
-        // Create new tags
-        await Promise.all(
-          newTags.map((tagName) =>
-            prisma.itemTags.create({
-              data: {
-                name: tagName,
-                user: { connect: { id: userId } },
-              },
-            }),
-          ),
-        );
-
-        // Delete unused tags
-        await prisma.itemTags.deleteMany({
-          where: { id: { in: tagsToDelete.map((tag) => tag.id) } },
-        });
+      await ctx.db.itemTags.createMany({
+        data: tags.map((t) => ({ name: t, userId: ctx.session.user.id })),
       });
-
-      return { success: true };
     }),
 });
 
