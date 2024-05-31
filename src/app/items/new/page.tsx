@@ -58,7 +58,7 @@ const NewItem = () => {
         <Button
           className="w-full"
           isLoading={addItem.isPending}
-          disabled={!itemName || !selectedTagId || addItem.isPending}
+          disabled={!itemName || addItem.isPending}
           onClick={() => {
             addItem.mutate({
               name: itemName,
