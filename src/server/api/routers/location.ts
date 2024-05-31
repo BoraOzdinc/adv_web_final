@@ -57,5 +57,8 @@ export const locationRouter = createTRPCRouter({
       return await ctx.db.locationItemDetail.delete({ where: { id: locationItemDetailId } })
     }
     return await ctx.db.locationItemDetail.update({ where: { id: locationItemDetailId }, data: { quantity } })
+  }),
+  getItemLocations: protectedProcedure.input(z.object({ itemId: NON_EMPTY_STRING })).query(async ({ ctx, input: { itemId } }) => {
+    return await ctx.db.locationItemDetail.findMany({ where: { itemId }, select: { location: { select: { name: true } }, quantity: true, id: true } })
   })
 });
