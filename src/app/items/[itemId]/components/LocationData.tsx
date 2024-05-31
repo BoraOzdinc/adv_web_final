@@ -23,7 +23,7 @@ const LocationData = ({ itemId }: { itemId: string }) => {
             key={l.id}
             className="cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground"
             onClick={() => {
-              router.push(`/layout/${l.location.id}`);
+              router.push(`/layout/${l.location?.id}`);
             }}
           >
             <CardHeader>
